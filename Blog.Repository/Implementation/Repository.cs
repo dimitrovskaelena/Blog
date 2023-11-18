@@ -35,6 +35,7 @@ namespace Blog.Repository.Implementation
 
         public IEnumerable<T> Get(
         Expression<Func<T, bool>> filter = null,
+        Expression<Func<T, object>>[] includeProperties = null,
         Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
         int? page = null,
         int? pageSize = null)
@@ -56,10 +57,10 @@ namespace Blog.Repository.Implementation
                 query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
             }
 
-            //foreach (var includeProperty in includeProperties)
-            //{
-            //    query = query.Include(includeProperty);
-            //}
+            foreach (var includeProperty in includeProperties)
+            {
+                query = query.Include(includeProperty);
+            }
 
             return query.ToList();
         }

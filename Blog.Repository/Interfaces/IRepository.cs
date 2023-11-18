@@ -13,6 +13,7 @@ namespace Blog.Repository.Interfaces
         T GetById(int id, params Expression<Func<T, object>>[] includeProperties);
         IEnumerable<T> Get(
         Expression<Func<T, bool>> filter = null,
+        Expression<Func<T, object>>[] includeProperties = null,
         Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
         int? page = null,
         int? pageSize = null

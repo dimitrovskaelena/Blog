@@ -30,7 +30,7 @@ namespace Blog.Services.Implementation
 
             if (entity == null)
             {
-                throw new InvalidOperationException($"Blog with ID {entity.Id} not found.");
+                throw new InvalidOperationException($"Blog with ID {entity?.Id} not found.");
             }
 
             entity.IsDeleted = true;
@@ -58,7 +58,10 @@ namespace Blog.Services.Implementation
 
             Func<IQueryable<BlogPost>, IOrderedQueryable<BlogPost>> orderByFunction = orderByExpression.Compile();
 
-            return _blogRepository.Get(orderBy: orderByFunction, page: page, pageSize: pageSize);
+            Expression<Func<BlogPost, object>>[] includeRelatedBlogPosts = { b => b.RelatedBlogs };
+
+            return _blogRepository.Get(orderBy: orderByFunction, includeProperties: includeRelatedBlogPosts, page: page, pageSize: pageSize);
+
         }
 
         public void Create(BlogPost entity)
@@ -99,7 +102,7 @@ namespace Blog.Services.Implementation
                 b => b.RelatedBlogs
             };
             var blogPost = _blogRepository.GetById(id, includeProperties);
-            return blogPost?.RelatedBlogs;
+            return blogPost.RelatedBlogs;
         }
 
         public void AddRelatedBlogPost(int id, BlogPost relatedBlog)
@@ -129,13 +132,43 @@ namespace Blog.Services.Implementation
 
                 if (relatedBlogToRemove != null)
                 {
-                    blogPost.RelatedBlogs.Remove(relatedBlogToRemove);
+                    blogPost.RelatedBlogs?.Remove(relatedBlogToRemove);
                     _blogRepository.Update(blogPost);
                     _blogRepository.SaveChanges();
                 }
             }
         }
 
+        public List<BlogNode> BuildBlogTree(List<BlogPost> allBlogs)
+        {
+            var treeNodes = allBlogs
+                .Where(blog => blog.RelatedBlogs == null || blog.RelatedBlogs.Count == 0)
+                .Select(blog => new BlogNode
+                {
+                    Id = blog.Id,
+                    Title = blog.Title,
+                    Children = GetChildren(allBlogs, blog.Id)
+                })
+                .ToList();
+
+            return treeNodes;
+
+        }
+
+        private List<BlogNode> GetChildren(List<BlogPost> blogPosts, int parentId)
+        {
+            var children = blogPosts
+                .Where(blog => blog.RelatedBlogs != null && blog.RelatedBlogs.Any(r => r.Id == parentId))
+                .Select(blog => new BlogNode
+                {
+                    Id = blog.Id,
+                    Title = blog.Title,
+                    Children = GetChildren(blogPosts, blog.Id)
+                })
+                .ToList();
+
+            return children;
+        }
         private void ValidateModel(BlogPost blog)
         {
             var context = new ValidationContext(blog, serviceProvider: null, items: null);
@@ -148,28 +181,5 @@ namespace Blog.Services.Implementation
             }
         }
 
-        public List<BlogNode> BuildBlogTree(IEnumerable<BlogPost> allBlogs)
-        {
-            var blogTree = new List<BlogNode>();
-            var blogDictionary = allBlogs.ToDictionary(blog => blog.Id);
-
-            foreach (var blog in allBlogs)
-            {
-                if (blog.RelatedBlogs != null && blog.RelatedBlogs.Any())
-                {
-                    // Blog has related blogs, find or create parent node
-                    var parentNode = blogTree.FirstOrDefault(node => node.Id == blog.Id) ?? new BlogNode { Id = blog.Id, Title = blog.Title };
-                    parentNode.Children.AddRange(blog.RelatedBlogs.Select(relatedBlog => new BlogNode { Id = relatedBlog.Id, Title = relatedBlog.Title }));
-                    blogTree.Add(parentNode);
-                }
-                else
-                {
-                    // Blog has no related blogs, add as a top-level node
-                    blogTree.Add(new BlogNode { Id = blog.Id, Title = blog.Title });
-                }
-            }
-
-            return blogTree;
-        }
     }
 }

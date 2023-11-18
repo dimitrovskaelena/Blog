@@ -40,31 +40,14 @@ namespace Blog.API.Controllers
         }
 
         [HttpGet("tree")]
-        public ActionResult<IEnumerable<BlogNode>> GetBlogTree()
+        public ActionResult<IEnumerable<BlogPost>> GetTree()
         {
-            try
-            {
-                var allBlogs = _blogServiceGeneric.GetAll(null, null);
-                var blogTree = _blogService.BuildBlogTree(allBlogs);
+            var blogPosts = _blogServiceGeneric.GetAll(null, null).ToList();
 
-                return Ok(blogTree);
-            }
-            catch (Exception ex)
-            {
-                // Log the exception or handle it appropriately
-                return StatusCode(500, "Internal Server Error");
-            }
+            var treeNodes = _blogService.BuildBlogTree(blogPosts);
+
+            return Ok(treeNodes);
         }
-
-        // GET: api/Blog
-        //[HttpGet]
-        //public ActionResult<IEnumerable<BlogPostDto>> GetAllBlogPosts()
-        //{
-        //    var blogPosts = _blogServiceGeneric.GetAll(null, null);
-        //    //var blogPostDtos = _mapper.Map<List<BlogPostDto>>(blogPosts);
-        //    //return Ok(blogPostDtos);
-        //    return Ok(blogPosts);
-        //}
 
         [HttpGet("{id}")]
         public IActionResult GetBlogById(int id)
@@ -72,7 +55,7 @@ namespace Blog.API.Controllers
             var blog = _blogServiceGeneric.GetById(id);
             if (blog == null)
             {
-                return NotFound($"Blog with ID {id} not found"); 
+                return NotFound($"Blog with ID {id} not found");
             }
 
             return Ok(blog);

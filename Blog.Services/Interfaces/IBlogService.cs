@@ -13,6 +13,6 @@ namespace Blog.Services.Interfaces
         IEnumerable<BlogPost> GetRelatedBlogPosts(int id);
         void AddRelatedBlogPost(int id, BlogPost relatedBlog);
         void RemoveRelatedBlogPost(int id, int relatedBlogId);
-        List<BlogNode> BuildBlogTree(IEnumerable<BlogPost> allBlogs);
+        List<BlogNode> BuildBlogTree(List<BlogPost> allBlogs);
     }
 }
