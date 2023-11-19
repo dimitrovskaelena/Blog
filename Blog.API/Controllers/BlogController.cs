@@ -71,7 +71,7 @@ namespace Blog.API.Controllers
 
             _blogServiceGeneric.Create(blog);
 
-            return CreatedAtAction(nameof(GetBlogById), new { id = blog.Id }, blog);
+            return Ok(new { Message = "Blog created successfully", CreatedBlog = blog });
         }
 
         [HttpPut("{id}")]
@@ -91,7 +91,7 @@ namespace Blog.API.Controllers
 
             _blogServiceGeneric.Update(blog);
 
-            return NoContent();
+            return Ok(new { Message = "Blog post updated successfully", Id = id });
         }
 
         [HttpDelete("{id}")]
@@ -106,7 +106,7 @@ namespace Blog.API.Controllers
 
             _blogServiceGeneric.Delete(id);
 
-            return NoContent();
+            return Ok(new { Message = "Blog post deleted successfully", Id = id });
         }
 
         [HttpGet("{id}/RelatedBlogs")]
@@ -132,7 +132,7 @@ namespace Blog.API.Controllers
 
             _blogService.AddRelatedBlogPost(id, relatedBlog);
 
-            return NoContent();
+            return Ok(new { Message = "Related blog added successfully", Id = id });
         }
 
         [HttpPost("{id}/AddRelatedBlogPost/{relatedBlogId}")]
@@ -148,14 +148,14 @@ namespace Blog.API.Controllers
 
             _blogService.AddRelatedBlogPost(id, relatedBlogPost);
 
-            return NoContent();
+            return Ok(new { Message = "Related blog added successfully", Id = id });
         }
 
         [HttpDelete("{id}/RelatedBlogs/{relatedBlogId}")]
         public IActionResult RemoveRelatedBlogPost(int id, int relatedBlogId)
         {
             _blogService.RemoveRelatedBlogPost(id, relatedBlogId);
-            return NoContent();
+            return Ok(new { Message = "Related blog removed successfully", Id = relatedBlogId });
         }
     }
 }

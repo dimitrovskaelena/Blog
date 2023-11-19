@@ -177,6 +177,7 @@ namespace Blog.Services.Implementation
 
             return children;
         }
+
         private void ValidateModel(BlogPost blog)
         {
             var context = new ValidationContext(blog, serviceProvider: null, items: null);
