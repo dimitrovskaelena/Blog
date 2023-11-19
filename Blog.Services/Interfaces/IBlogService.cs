@@ -11,7 +11,7 @@ namespace Blog.Services.Interfaces
     public interface IBlogService
     {
         IEnumerable<BlogPost> GetRelatedBlogPosts(int id);
-        void AddRelatedBlogPost(int id, BlogPost relatedBlog);
+        BlogPost AddRelatedBlogPost(int id, BlogPost relatedBlog);
         void RemoveRelatedBlogPost(int id, int relatedBlogId);
         List<BlogNode> BuildBlogTree(List<BlogPost> allBlogs);
     }

@@ -72,11 +72,13 @@ namespace Blog.Services.Implementation
 
         }
 
-        public void Create(BlogPost entity)
+        public BlogPost Create(BlogPost entity)
         {
             ValidateModel(entity);
             _blogRepository.Create(entity);
             _blogRepository.SaveChanges();
+
+            return entity;
         }
 
         public void Update(BlogPost entity)
@@ -113,7 +115,7 @@ namespace Blog.Services.Implementation
             return blogPost.RelatedBlogs;
         }
 
-        public void AddRelatedBlogPost(int id, BlogPost relatedBlog)
+        public BlogPost AddRelatedBlogPost(int id, BlogPost relatedBlog)
         {
             var blogPost = _blogRepository.GetById(id);
 
@@ -128,6 +130,8 @@ namespace Blog.Services.Implementation
                 _blogRepository.Update(blogPost);
                 _blogRepository.SaveChanges();
             }
+
+            return relatedBlog;
         }
 
         public void RemoveRelatedBlogPost(int id, int relatedBlogId)

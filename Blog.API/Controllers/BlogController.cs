@@ -69,9 +69,8 @@ namespace Blog.API.Controllers
                 return BadRequest();
             }
 
-            _blogServiceGeneric.Create(blog);
-
-            return Ok(new { Message = "Blog created successfully", CreatedBlog = blog });
+            var createdBlog = _blogServiceGeneric.Create(blog);
+            return Ok(new { Message = "Blog post created successfully", Id = createdBlog.Id });
         }
 
         [HttpPut("{id}")]
@@ -130,9 +129,9 @@ namespace Blog.API.Controllers
                 return BadRequest();
             }
 
-            _blogService.AddRelatedBlogPost(id, relatedBlog);
+            var createdRelatedBlog = _blogService.AddRelatedBlogPost(id, relatedBlog);
 
-            return Ok(new { Message = "Related blog added successfully", Id = id });
+            return Ok(new { Message = "Blog post created successfully", Id = createdRelatedBlog.Id });
         }
 
         [HttpPost("{id}/AddRelatedBlogPost/{relatedBlogId}")]
@@ -145,7 +144,7 @@ namespace Blog.API.Controllers
             {
                 return NotFound();
             }
-
+                        
             _blogService.AddRelatedBlogPost(id, relatedBlogPost);
 
             return Ok(new { Message = "Related blog added successfully", Id = id });

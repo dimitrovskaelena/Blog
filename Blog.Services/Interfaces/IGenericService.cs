@@ -12,7 +12,7 @@ namespace Blog.Services.Interfaces
     {
         IEnumerable<T> GetAll(string? filter, int ? page, int? pageSize);
         T GetById(int id);
-        void Create(T entity);
+        T Create(T entity);
         void Update(T entity);
         void Delete(int id);
         int GetTotalCount();
