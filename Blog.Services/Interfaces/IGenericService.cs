@@ -10,7 +10,7 @@ namespace Blog.Services.Interfaces
 {
     public interface IGenericService<T> where T : class
     {
-        IEnumerable<T> GetAll(int? page, int? pageSize);
+        IEnumerable<T> GetAll(string? filter, int ? page, int? pageSize);
         T GetById(int id);
         void Create(T entity);
         void Update(T entity);

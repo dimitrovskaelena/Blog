@@ -22,7 +22,7 @@ builder.Services.AddAutoMapper(typeof(MappingProfiles));
 builder.Services.AddDbContext<BlogDataContext>(options => options.UseSqlServer(ConnectionString));
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IGenericService<BlogPost>, BlogService>();
-builder.Services.AddTransient<IBlogService, BlogService>();
+builder.Services.AddScoped<IBlogService, BlogService>();
 
 var app = builder.Build();
 
@@ -33,9 +33,22 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseCors(builder => builder
+       .AllowAnyHeader()
+       .AllowAnyMethod()
+       .AllowAnyOrigin()
+    );
 
+app.UseRouting();
 app.UseAuthorization();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+});
+
+app.UseHttpsRedirection();
 
 app.MapControllers();
 

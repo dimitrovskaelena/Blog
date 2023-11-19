@@ -26,9 +26,9 @@ namespace Blog.API.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllBlogs(int page = 1, int pageSize = 10)
+        public IActionResult GetAllBlogs(string? filter, int page = 1, int pageSize = 10)
         {
-            var blogs = _blogServiceGeneric.GetAll(page, pageSize);
+            var blogs = _blogServiceGeneric.GetAll(filter, page, pageSize);
             var totalItems = _blogServiceGeneric.GetTotalCount();
 
             if (blogs == null || !blogs.Any())
@@ -36,13 +36,13 @@ namespace Blog.API.Controllers
                 return NotFound();
             }
 
-            return Ok(new { Data = _mapper.Map<List<BlogNode>>(blogs), TotalItems = totalItems });
+            return Ok(new { Data = blogs, TotalItems = totalItems });
         }
 
         [HttpGet("tree")]
-        public ActionResult<IEnumerable<BlogPost>> GetTree()
+        public ActionResult<IEnumerable<BlogPost>> GetTree(string? filter)
         {
-            var blogPosts = _blogServiceGeneric.GetAll(null, null).ToList();
+            var blogPosts = _blogServiceGeneric.GetAll(filter, null, null).ToList();
 
             var treeNodes = _blogService.BuildBlogTree(blogPosts);
 

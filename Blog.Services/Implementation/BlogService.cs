@@ -51,8 +51,16 @@ namespace Blog.Services.Implementation
         }
 
 
-        public IEnumerable<BlogPost> GetAll(int? page, int? pageSize)
+        public IEnumerable<BlogPost> GetAll(string? filter, int? page, int? pageSize)
         {
+            Expression<Func<BlogPost, bool>>? filterExpression = null;
+
+            if (!string.IsNullOrEmpty(filter))
+            {
+                var titleFilter = filter.ToLower();
+                filterExpression = blog => blog.Title.ToLower().Contains(titleFilter);
+            }
+
             Expression<Func<IQueryable<BlogPost>, IOrderedQueryable<BlogPost>>> orderByExpression =
             query => query.OrderByDescending(blog => blog.CreatedOn);
 
@@ -60,7 +68,7 @@ namespace Blog.Services.Implementation
 
             Expression<Func<BlogPost, object>>[] includeRelatedBlogPosts = { b => b.RelatedBlogs };
 
-            return _blogRepository.Get(orderBy: orderByFunction, includeProperties: includeRelatedBlogPosts, page: page, pageSize: pageSize);
+            return _blogRepository.Get(filter: filterExpression, orderBy: orderByFunction, includeProperties: includeRelatedBlogPosts, page: page, pageSize: pageSize);
 
         }
 
